@@ -1,0 +1,84 @@
+agronaLibrary {
+  nativeLibraryProject ":agrona-native-lib"
+  testAgent :libs.mockito
+
+  dependencies {
+    testPlatform [:libs.junit.bom]
+    testImplementation [
+      "org.junit.jupiter:junit-jupiter-params",
+      :libs.hamcrest,
+      :libs.mockito,
+      :libs.guava.testlib,
+      :libs.junit4, // Compatibility with JUnit 4
+    ]
+    testRuntimeOnly [
+      "org.junit.jupiter:junit-jupiter-engine",
+      "org.junit.vintage:junit-vintage-engine",
+      "org.junit.platform:junit-platform-launcher",
+    ]
+  }
+
+  manifest [
+    Automatic-Module-Name: "org.agrona",
+    Implementation-Title: "Agrona",
+    Implementation-Vendor: "Adaptive Financial Consulting Limited",
+  ]
+
+  pom {
+    name "agrona"
+    description "High performance primitives and utility library."
+    url "https://github.com/aeron-io/agrona"
+
+    scm {
+      connection "scm:git:https://github.com/aeron-io/agrona.git"
+      developerConnection "scm:git:https://github.com/aeron-io/agrona.git"
+      url "https://github.com/aeron-io/agrona.git"
+    }
+
+    licenses [
+      {
+        name "The Apache License, Version 2.0"
+        url "https://www.apache.org/licenses/LICENSE-2.0.txt"
+      },
+    ]
+
+    developers [
+      {
+        id "tmontgomery"
+        name "Todd L. Montgomery"
+        email "tmont@nard.net"
+        url "https://github.com/tmontgomery"
+      },
+      {
+        id "mjpt777"
+        name "Martin Thompson"
+        email "mjpt777@gmail.com"
+        url "https://github.com/mjpt777"
+      },
+      {
+        id "RichardWarburton"
+        name "Richard Warburton"
+        email "richard.warburton@gmail.com"
+        url "https://github.com/RichardWarburton"
+      },
+      {
+        id "nitsanw"
+        name "Nitsan Wakart"
+        email "nitsanw@yahoo.com"
+        url "https://github.com/nitsanw"
+      },
+      {
+        id "mikeb01"
+        name "Mike Barker"
+        email "mikeb01@gmail.com"
+        url "https://github.com/mikeb01"
+      },
+      {
+        id "vyazelenko"
+        name "Dmytro Vyazelenko"
+        email "vyazelenko@protonmail.com"
+        url "https://github.com/vyazelenko"
+      },
+    ]
+  }
+}

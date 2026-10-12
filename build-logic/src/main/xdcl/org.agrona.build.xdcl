@@ -1,0 +1,10 @@
+plugin {
+  displayName "Agrona build"
+  description "Project types used by the Agrona build."
+  reactions [
+    :org.agrona.build.AgronaBuildReaction,
+    :org.agrona.build.AgronaLibraryReaction,
+    :org.agrona.build.ShadedToolReaction,
+    :org.agrona.build.ZigNativeLibraryReaction,
+  ]
+}

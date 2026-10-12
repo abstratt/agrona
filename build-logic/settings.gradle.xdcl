@@ -1,0 +1,13 @@
+// Build logic for the Agrona build: an XDCL plugin (schema + reactions) providing the project types
+// configured by the build.gradle.xdcl files of the main build.
+settings {
+  plugins [
+    { id "plugin-development-ecosystem" }
+  ]
+  dependencyResolutionManagement {
+    repositories [:mavenCentral, :gradlePluginPortal]
+  }
+  rootProject {
+    name "build-logic"
+  }
+}

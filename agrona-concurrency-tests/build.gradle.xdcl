@@ -1,0 +1,14 @@
+shadedTool {
+  archiveFileName "concurrency-tests.jar"
+  classifier "concurrency-tests"
+  mainClass "org.openjdk.jcstress.Main"
+
+  dependencies {
+    implementation [:libs.jcstress.core, :projects.agrona]
+    annotationProcessor [:libs.jcstress.core]
+  }
+
+  jcstress {
+    jvmArgs "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED -Dagrona.disable.bounds.checks=true -Dagrona.strict.alignment.checks=true -XX:+UseParallelGC"
+  }
+}

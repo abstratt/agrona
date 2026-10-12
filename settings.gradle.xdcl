@@ -1,0 +1,12 @@
+settings {
+  pluginManagement {
+    includedBuilds ["build-logic"]
+  }
+  plugins [
+    { id "org.agrona.build" }
+  ]
+  dependencyResolutionManagement {
+    repositories [:mavenCentral]
+  }
+  include ["agrona", "agrona-benchmarks", "agrona-concurrency-tests", "agrona-native-lib"]
+}

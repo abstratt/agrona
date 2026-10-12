@@ -26,8 +26,8 @@ out
 build-local.properties
 .gradle/
 build/
-!buildSrc/
-!buildSrc/src/**/build
+!build-logic/
+!build-logic/src/**/build
 .zig-cache
 /agrona-native-lib/scripts/zig/
 /agrona-native-lib/scripts/zig.tmp.*
