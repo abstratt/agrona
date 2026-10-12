@@ -1,6 +1,6 @@
 # Agrona: Groovy DSL to XDCL conversion report
 
-Date: 2026-10-12. Branch: `xdcl-build` (nothing committed; all changes are in the working tree).
+Date: 2026-10-12. Branch: `convert-build-to-xdcl`.
 
 ## Summary
 
@@ -113,6 +113,13 @@ Deleted: `build.gradle`, `buildSrc/`.
 - The baseline build was run without tests, so there is no before/after test comparison.
 - The CI workflows call the same `./gradlew` commands but were not run. They will now download a
   development snapshot of Gradle.
+- Wrapper validation in CI: the workflows use `gradle/actions/setup-gradle`, which validates
+  `gradle-wrapper.jar` and rejects snapshot wrappers by default. The jar was regenerated from the
+  snapshot distribution and its checksum was not checked against the published list, so the step
+  may fail unless `allow-snapshot-wrappers: true` is set.
+- CodeQL: `codeql.yml` does not call `./gradlew`; it relies on autobuild detecting a Gradle
+  project. `build.gradle` is gone, so detection now depends on the stub `settings.gradle`. Not
+  tested.
 
 ## Things to know
 
@@ -120,6 +127,11 @@ Deleted: `build.gradle`, `buildSrc/`.
   `settings.gradle` sits next to `settings.gradle.xdcl` (root and `build-logic`). The XDCL tooling
   guidance says to keep the stub for IDEs and the wrapper task; delete both stubs for a quiet
   build.
+- **Empty build on stock Gradle:** the stub `settings.gradle` includes no projects, so a Gradle
+  without XDCL support (anything other than the pinned wrapper) sees an empty build instead of
+  failing with a clear error.
+- **Test dependency order:** in `agrona`, the generated classes directory is now declared last in
+  `testImplementation` instead of first. The resolved compile and test classpaths are unchanged.
 - **`mavenLocal()` is gone:** XDCL settings accept only `:mavenCentral`, `:gradlePluginPortal` or
   a URL.
 - **Duplicated versions:** `build-logic/build.gradle.xdcl` hard-codes the ByteBuddy, json, shadow,
