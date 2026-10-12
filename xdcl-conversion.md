@@ -141,6 +141,81 @@ Deleted: `build.gradle`, `buildSrc/`.
   stock Gradle 9.8.1 (its download was too slow). This compares the two build definitions on one
   Gradle version.
 
+## Is the new configuration better than the old code?
+
+Short answer: the per-project definitions are clearly better to read and to check; the build as a
+whole is not simpler, and today it costs more to maintain. The conversion does not change what
+the build does, so there is no functional or (measured) performance gain.
+
+### Size
+
+| | Before | After |
+|---|---|---|
+| Build definition | 632 lines of Groovy (`build.gradle` 599, plus `settings.gradle` and `buildSrc` scripts) | 150 lines of `.gradle.xdcl` across 8 scripts |
+| Supporting logic | none beyond the three `buildSrc` task classes | 98-line schema, 10-line descriptor, 988 lines of Java (7 new classes, including license headers) |
+| Total | about 630 lines | about 1,250 lines |
+
+The total roughly doubled. The Groovy logic did not go away; it moved into Java, which is more
+verbose, and a schema had to be written to describe the data the scripts carry.
+
+### Where the new definitions are better
+
+- **Each project states what it is.** `agrona-benchmarks/build.gradle.xdcl` is 10 lines: a
+  shaded tool with a jar name, a main class and three dependencies. Before, the same facts were
+  spread over `allprojects`, `subprojects` and a `project(':agrona-benchmarks')` block in a
+  599-line file.
+- **Data and logic are separated.** The scripts hold only values (dependencies, pom metadata,
+  manifest attributes, jar names). All behaviour is in `build-logic`, in typed Java.
+- **Checked before the build runs.** The scripts validate against a schema in milliseconds with
+  `xdcl-lsp-client validate`, without starting Gradle. A misspelled property or a wrong type is a
+  located error. In the Groovy script the same mistake surfaced at configuration time or not at
+  all.
+- **Tooling can read the values.** `xdcl-lsp-client effective` and `explain` report what each
+  property resolves to and where it came from. During the conversion this flagged a value that
+  merely repeated its schema default. Nothing comparable exists for an arbitrary Groovy script.
+- **Shared conventions are one explicit thing.** `JavaConventions.apply` replaces the implicit
+  cross-project configuration of `allprojects { }` and `subprojects { }`. Which project gets
+  which conventions is now decided by the project type it declares.
+- **The logic is compiled.** The reactions are statically typed Java, so API mistakes are compile
+  errors. The old script used dynamic Groovy throughout.
+
+### Where the old code was better
+
+- **One file.** Everything was visible in `build.gradle`. Understanding the new build means
+  reading a script, the schema, and the reaction behind it.
+- **Less code and less ceremony.** A small change to behaviour (a new JVM flag, a new task) was a
+  one-line edit. Now it is a Java change in `build-logic`, and if it needs a new setting, a
+  schema change and a script change as well.
+- **Stable toolchain.** The old build ran on a released Gradle. The new one requires a
+  development snapshot of Gradle and pre-release XDCL tooling, both of which can change without
+  notice.
+- **Single source of versions.** `buildSrc` read its dependencies from the version catalog.
+  `build-logic` hard-codes five of them as strings.
+- **`mavenLocal()` and the `-all` wrapper distribution** were available.
+- **No warning noise.** The new build reports "Multiple settings script files" on every run
+  because of the marker stubs.
+
+### What did not change
+
+- **Behaviour.** The task list, task execution order, generated pom and jar contents are
+  identical to the baseline.
+- **The amount of custom logic.** Agrona's build is mostly bespoke (Zig cross-compilation,
+  ByteBuddy weaving, source generation, Central Portal upload). XDCL has no built-in project type
+  for any of it, so every line of that logic still exists; it is now Java instead of Groovy.
+- **Cross-project coupling.** `agrona` still needs `evaluationDependsOn` on the native-lib
+  project, and the shaded tools still depend on `:agrona:byteBuddy` by task path.
+
+### Overall
+
+For a reader who wants to know what a project is and depends on, the new definitions are an
+improvement: short, typed, validated, and free of logic. For someone who has to change how the
+build works, it is a wash or slightly worse: the logic is better structured and compiled, but
+there is twice as much of it, in three places instead of one, on a pre-release toolchain.
+
+The balance would shift if Gradle shipped a Java-library project type for XDCL. Most of
+`JavaConventions` and parts of the reactions could then be deleted, and the hand-written schema
+would shrink to the Agrona-specific parts.
+
 ## How to work with the build
 
 ```
