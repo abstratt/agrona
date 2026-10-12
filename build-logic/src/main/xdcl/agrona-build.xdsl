@@ -1,0 +1,98 @@
+package org.agrona.build.dsl
+
+/// A dependency: either `"group:name:version"` coordinates (a String), or a Symbol naming a version
+/// catalog library (`:libs.jmh.core`) or a project of this build (`:projects.agrona`).
+type DependencyNotation = String | Symbol
+
+/// Dependencies of a [JavaModule], by scope.
+record ModuleDependencies {
+  api: [DependencyNotation]?
+  implementation: [DependencyNotation]?
+  compileOnly: [DependencyNotation]?
+  runtimeOnly: [DependencyNotation]?
+  annotationProcessor: [DependencyNotation]?
+  testImplementation: [DependencyNotation]?
+  testRuntimeOnly: [DependencyNotation]?
+  /// Platforms (BOMs) constraining the test dependencies.
+  testPlatform: [DependencyNotation]?
+}
+
+/// A project built with the Agrona Java conventions: toolchain, Checkstyle, strict compiler and
+/// Javadoc settings, and the common test JVM setup.
+trait JavaModule {
+  /// The Java release the sources are compiled for.
+  javaRelease: Int = 17
+  dependencies: ModuleDependencies?
+}
+
+record Scm {
+  connection: String
+  developerConnection: String
+  url: String
+}
+
+record License {
+  name: String
+  url: String
+}
+
+record Developer {
+  id: String
+  name: String
+  email: String
+  url: String
+}
+
+/// The metadata of the published Maven POM.
+record Pom {
+  name: String
+  description: String
+  url: String
+  scm: Scm
+  licenses: [License]
+  developers: [Developer]
+}
+
+/// Runs the jcstress tests from the shaded jar via the `concurrencyTests` task.
+record Jcstress {
+  /// JVM arguments for the forked test JVMs, as a single command line.
+  jvmArgs: String
+  /// The reports directory, relative to the build directory.
+  reportDir: String = "reports/jcstress"
+}
+
+/// The root project: aggregate reporting, test log collection and the Central Portal upload.
+template AgronaBuild {
+  agronaBuild {
+    defaultTasks: [String]?
+  }
+}
+
+/// The published Agrona library.
+template AgronaLibrary with JavaModule {
+  agronaLibrary {
+    /// Extra attributes of the jar manifest; `Implementation-Version` is always added.
+    manifest: [String: String]?
+    /// Path of the project that builds the JNI library bundled into the jar.
+    nativeLibraryProject: String
+    /// Attached to the test JVM as a `-javaagent`.
+    testAgent: DependencyNotation?
+    pom: Pom
+  }
+}
+
+/// An executable tool packaged as a shaded jar on top of the Agrona library.
+template ShadedTool with JavaModule {
+  shadedTool {
+    archiveFileName: String
+    classifier: String
+    mainClass: String
+    jcstress: Jcstress?
+  }
+}
+
+/// The JNI library, cross-compiled with Zig.
+template ZigNativeLibrary with JavaModule {
+  zigNativeLibrary {
+  }
+}

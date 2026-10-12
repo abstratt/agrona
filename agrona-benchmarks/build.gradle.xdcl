@@ -1,0 +1,10 @@
+shadedTool {
+  archiveFileName "benchmarks.jar"
+  classifier "benchmarks"
+  mainClass "org.openjdk.jmh.Main"
+
+  dependencies {
+    implementation [:libs.jmh.core, :projects.agrona]
+    annotationProcessor [:libs.jmh.generator.annprocess]
+  }
+}

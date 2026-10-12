@@ -1,0 +1,12 @@
+// NOTE: versions must be kept in sync with gradle/libs.versions.toml.
+xdclGradlePlugin {
+  dependencies {
+    implementation [
+      "net.bytebuddy:byte-buddy-gradle-plugin:1.18.14",
+      "org.json:json:20250517",
+      "com.gradleup.shadow:shadow-gradle-plugin:9.6.1",
+      "io.github.ben-manes:gradle-versions-plugin:0.65.0",
+    ]
+    compileOnly ["com.google.code.findbugs:findbugs-annotations:3.0.1"]
+  }
+}

@@ -13,13 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
+package org.agrona.build;
 
-dependencies {
-    implementation libs.byteBuddy.gradle.plugin
-    implementation libs.json
-    compileOnly libs.findbugs.annotations
+import org.agrona.build.dsl.ZigNativeLibrary;
+import org.gradle.api.Project;
+import org.gradle.api.xdcl.Reaction;
+import org.gradle.api.xdcl.ReactionScope;
+
+/**
+ * Configures the project building the JNI library with Zig.
+ */
+public class ZigNativeLibraryReaction implements Reaction<ZigNativeLibrary, Project>
+{
+    /**
+     * {@inheritDoc}
+     */
+    public void on(final ZigNativeLibrary data, final Project project, final ReactionScope scope)
+    {
+        JavaConventions.apply(project, data);
+        ZigBuild.apply(project);
+    }
 }

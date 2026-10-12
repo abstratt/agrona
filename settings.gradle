@@ -1,1 +1,1 @@
-include ':agrona', 'agrona-benchmarks', 'agrona-concurrency-tests', ':agrona-native-lib'
+// Gradle-build marker; the effective settings live in settings.gradle.xdcl

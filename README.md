@@ -40,7 +40,7 @@ Build
 
 ### Java Build
 
-Build the project with [Gradle](http://gradle.org/) using this [build.gradle](https://github.com/aeron-io/agrona/blob/master/build.gradle) file.
+Build the project with [Gradle](http://gradle.org/) using the declarative [build.gradle.xdcl](https://github.com/aeron-io/agrona/blob/master/build.gradle.xdcl) scripts, backed by the build logic in [build-logic](https://github.com/aeron-io/agrona/tree/master/build-logic).
 
 You require the following to build Agrona:
 
